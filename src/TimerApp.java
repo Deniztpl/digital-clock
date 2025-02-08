@@ -7,6 +7,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
+
 
 public class TimerApp {
     private static final int WORK_DURATION = 52; // 52 minutes
@@ -91,7 +93,7 @@ public class TimerApp {
         // Set up the system tray icon
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            Image image = Toolkit.getDefaultToolkit().getImage(TimerApp.class.getResource("/resources/icon.jpg"));
+            Image image = Toolkit.getDefaultToolkit().getImage(TimerApp.class.getResource("resources/icon.jpg"));
             TrayIcon trayIcon = new TrayIcon(image, "17-52 Timer");
 
             // Add a MouseListener to handle double-click events
@@ -152,24 +154,28 @@ public class TimerApp {
     }
 
     private static void playBellSound() {
-        playSound("/resources/bell.wav"); // Play bell sound
+        playSound("resources/bell.wav"); // Play bell sound
     }
 
     private static void playClickSound() {
-        playSound("/resources/click.wav"); // Play click sound
+        playSound("resources/click.wav"); // Play click sound
     }
 
     private static void playThirdSound() {
-        playSound("/resources/third.wav"); // Play third sound
+        playSound("resources/third.wav"); // Play third sound
     }
 
     private static void playSound(String soundFile) {
         try {
-            InputStream soundStream = TimerApp.class.getResourceAsStream(soundFile);
-            if (soundStream == null) {
+            InputStream audioSrc = TimerApp.class.getResourceAsStream(soundFile);
+            if (audioSrc == null) {
                 throw new IOException("Resource not found: " + soundFile);
             }
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundStream);
+
+            // Convert the input stream to a buffered input stream
+            InputStream bufferedIn = new BufferedInputStream(audioSrc);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bufferedIn);
+
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             clip.start();
@@ -177,4 +183,5 @@ public class TimerApp {
             e.printStackTrace();
         }
     }
+
 }
